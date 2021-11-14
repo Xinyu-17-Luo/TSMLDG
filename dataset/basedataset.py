@@ -31,6 +31,7 @@ class BaseDataSet(Dataset):
         self.paths = self._split_data(root)
 
     def split_data(self, root):
+        # implemented in each dataset methode
         raise NotImplementedError()
 
     def _split_data(self, root):
@@ -90,6 +91,7 @@ class BaseDataSet(Dataset):
             if f is None:
                 continue
             img, mask = f(img, mask, self.mode)
+        # return post-pocessed image and mask
         return img_filename, img, mask
 
     def __len__(self):
