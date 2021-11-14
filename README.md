@@ -59,3 +59,6 @@ python eval.py --name exp --targets C --test-size 16
 ```
 python predict.py --name exp --targets C --test-size 16
 ```
+## Notes
+__ResNet__
+Load url of ResNet should be changed in network/backbone/resnet.py
