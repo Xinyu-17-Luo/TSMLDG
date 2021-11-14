@@ -43,7 +43,7 @@ We also generated some synthetic images with [CycleGAN](https://github.com/junya
 
 The model can be trained with `train.py`. If we want to train the MLDG with four source domains(G, S, I, M) and one target domain(C), we can parse these arguments.
 ```
-python train.py --name exp --source GSIM --target C --train-num 1  
+python train.py --name exp --source GSIM --target C --train-num 1 --train-size 4 --resume True
 ```
 For more details, please refer to `train.py`
 
