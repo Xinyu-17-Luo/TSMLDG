@@ -143,6 +143,7 @@ class CityScapesDataSet(BaseDataSet):
                    'car': 26, 'truck': 27, 'bus': 28, 'train': 31, 'motorcycle': 32, 'bicycle': 33}
         self.idx_of_objects = {k: i for i, k in enumerate(objects.keys())}
         self.idx_2_key = {i:k for i, k in enumerate(objects.keys())}
+        # _key: TrainID?
         self._key = np.array([ignore_idx,
                               ignore_idx, ignore_idx, ignore_idx, ignore_idx, ignore_idx,
                               ignore_idx, ignore_idx, 0, 1, ignore_idx, ignore_idx,
@@ -150,7 +151,7 @@ class CityScapesDataSet(BaseDataSet):
                               5, ignore_idx, 6, 7, 8, 9,
                               10, 11, 12, 13, 14, 15,
                               ignore_idx, ignore_idx, 16, 17, 18])
-        # mapping : (-1, 33) = 35
+        # _mapping : label ID (, (-1, 33) = 35,
         self._mapping = np.array(range(ignore_idx, len(self._key) - 1)).astype('int32')
 
     def print_label_mapping(self):
@@ -177,6 +178,7 @@ class CityScapesDataSet(BaseDataSet):
         for v in values:
             assert (v in self._mapping), '{} is not in mapping {}'.format(v, self._mapping)
         index = np.digitize(mask.ravel(), self._mapping, right=True)
+        # 把mask的像素对应的label Id转化为cityscapes的TrainId （-1 replace 255）
         result = self._key[index].reshape(mask.shape)
         return result
 
@@ -198,6 +200,8 @@ class CityScapesDataSet(BaseDataSet):
         if mask is None:
             return img, mask
         mask[mask == 255] = -1
+        # target：每一个像素对应的cityscapes train Id （-1到18，19个类）
+        # 这里需要所有的dataset映射的结果都一样
         target = self._class_to_index(np.array(mask).astype('int32'))
         mask = torch.from_numpy(target).long()
         return img, mask
@@ -267,6 +271,7 @@ class GTA5(CityScapesDataSet):
                  random_rotate=True, dataset_name='gta5'):
         self.name = dataset_name
         super(GTA5, self).__init__(root, output_path, force_cache, mode, base_size, crop_size, scale, random_scale, random_rotate)
+        # load_img()产生的mask有19个类+一个void (-1 -> 18)，即为cityscapes的TrainId
         self.classes = [label[0] for label in labels]
         self._key = np.array(label_to_citys(self.classes, self.idx_of_objects)).astype('int32')
         self._mapping = np.array(range(-1, len(self._key) - 1)).astype('int32')
